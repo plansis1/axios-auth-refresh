@@ -88,7 +88,7 @@ type AxiosAuthRefreshProps<TData = unknown, TError = unknown> = {
 
 export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
   axiosInstance,
-  refreshAuthCall,
+  refreshAuthCall, // <= TODO: skipAuthRefresh
   onError,
   onSuccess,
   options: optionsProp = {},
