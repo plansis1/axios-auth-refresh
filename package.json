@@ -1,6 +1,6 @@
 {
   "name": "@plansis/axios-auth-refresh",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "keywords": [
     "axios",
     "refresh token",
@@ -23,7 +23,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "axios": "^1.6.7"
+    "axios": "^1.4.0"
   },
   "devDependencies": {
     "typescript": "^5.0.2"
