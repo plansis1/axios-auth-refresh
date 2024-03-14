@@ -1,11 +1,12 @@
 {
-  "name": "axios-auth-refresh",
+  "name": "@plansis/axios-auth-refresh",
   "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/plansis1/axios-auth-refresh.git"
   },
   "main": "./dist/index.js",
+  "author": "plansis",
   "license": "MIT",
   "scripts": {
     "tsc": "tsc -p .",
