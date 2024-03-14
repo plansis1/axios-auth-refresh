@@ -1,13 +1,21 @@
 {
   "name": "@plansis/axios-auth-refresh",
   "version": "1.0.0",
+  "keywords": [
+    "axios",
+    "refresh token",
+    "interceptor",
+    "auto refresh"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/plansis1/axios-auth-refresh.git"
   },
   "main": "./dist/index.js",
-  "author": "plansis",
+  "types": "./dist/index.d.ts",
+  "author": "plansis <mas@plansis.ru>",
   "license": "MIT",
+  "private": false,
   "scripts": {
     "tsc": "tsc -p .",
     "tsc:watch": "tsc -p . --watch",
