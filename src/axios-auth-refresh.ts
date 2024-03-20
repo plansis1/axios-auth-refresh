@@ -1,6 +1,7 @@
 import { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 
-import { AxiosAuthRefreshRequestConfig } from "./types";
+import type { AxiosAuthRefreshRequestConfig } from "./types";
+import { sleep } from "./utils";
 
 let isRefreshing = false;
 
@@ -130,5 +131,3 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
     }
   );
 };
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
