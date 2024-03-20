@@ -32,28 +32,28 @@ const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
   onError,
   options,
 }: RefreshAndExecuteQueueProps<TData, TError>) => {
-  const { retryDelay, retries } = options;
+  const { retryDelay, retry } = options;
 
   isRefreshing = true;
 
   let isRefreshed = false;
-  let retriesLeft = retries;
+  let retryLeft = retry;
 
   let refreshResponse: undefined | AxiosResponse<TData>;
   let refreshError: undefined | AxiosError<TError>;
 
   await (async () => {
-    while (retriesLeft > 0 && !isRefreshed) {
+    while (retryLeft > 0 && !isRefreshed) {
       try {
         const response = await refreshAuthCall();
         refreshResponse = response;
         isRefreshed = true;
-        retriesLeft--;
+        retryLeft--;
       } catch (error) {
         refreshError = <AxiosError<TError>>error;
-        if (retriesLeft > 0) await sleep(retryDelay);
+        if (retryLeft > 0) await sleep(retryDelay);
         else break;
-        retriesLeft--;
+        retryLeft--;
       }
     }
   })();
@@ -73,8 +73,11 @@ const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
 };
 
 type AxiosAuthRefreshOptions = {
-  retries: number;
+  /** Количество попыток выполнения запроса */
+  retry: number;
+  /** Задержка применяемая перед следующей попыткой выполнения запроса в мс */
   retryDelay: number;
+  /** Коды состояния для которых отработает перехватчик. */
   statusCodes: Array<number>;
 };
 
@@ -97,7 +100,7 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
   const options = {
     statusCodes: [401],
     retryDelay: 300,
-    retries: 3,
+    retry: 3,
     ...optionsProp,
   };
 
