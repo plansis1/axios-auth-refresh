@@ -7,7 +7,7 @@
 
 ```typescript
 import axios from 'axios';
-import { axiosAuthRefresh } from 'axios-auth-refresh';
+import { axiosAuthRefresh } from '@plansis/axios-auth-refresh';
 
 const axiosInstance = axios.create({
   withCredentials: true,
