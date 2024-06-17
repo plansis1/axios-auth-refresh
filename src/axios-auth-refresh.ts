@@ -112,7 +112,7 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
     }) => {
       const originalRequestConfig = error.config;
       const skipAuthRefresh = originalRequestConfig.skipAuthRefresh;
-      const hasStatus = options.statusCodes.includes(error.response.status);
+      const hasStatus = options.statusCodes.includes(error.response?.status);
 
       if (!hasStatus || skipAuthRefresh) return Promise.reject(error);
 
