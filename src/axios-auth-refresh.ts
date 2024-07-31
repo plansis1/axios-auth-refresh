@@ -4,6 +4,7 @@ import type { AxiosAuthRefreshRequestConfig } from "./types";
 import { sleep } from "./utils";
 
 let isRefreshing = false;
+let callCount = 0;
 
 type QueueItem = { resolve: () => void; reject: (err: unknown) => void };
 let queue: Array<QueueItem> = [];
@@ -32,38 +33,48 @@ const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
   onError,
   options,
 }: RefreshAndExecuteQueueProps<TData, TError>) => {
-  const { retryDelay, retry } = options;
+  const { retryDelayMs, maxRetryCount, maxCallCount } = options;
 
   isRefreshing = true;
 
   let isRefreshed = false;
-  let retryLeft = retry;
+  let retryAttempts = 0;
 
   let refreshResponse: undefined | AxiosResponse<TData>;
   let refreshError: undefined | AxiosError<TError>;
 
   await (async () => {
-    while (retryLeft > 0 && !isRefreshed) {
+    while (
+      retryAttempts < maxRetryCount &&
+      !isRefreshed &&
+      callCount < maxCallCount
+    ) {
       try {
+        ++callCount;
+        ++retryAttempts;
+        // console.log(`Попытка обновления токена №${retryAttempts}`);
         const response = await refreshAuthCall();
         refreshResponse = response;
         isRefreshed = true;
-        retryLeft--;
       } catch (error) {
         refreshError = <AxiosError<TError>>error;
-        if (retryLeft > 0) await sleep(retryDelay);
+        console.error(`Ошибка обновления токена: ${refreshError.message}`);
+        if (retryAttempts < maxRetryCount) await sleep(retryDelayMs);
         else break;
-        retryLeft--;
       }
     }
   })();
 
   if (!isRefreshed) {
-    queue.forEach((v) => v.reject("token wasnt refresh"));
+    console.error(
+      "Не удалось обновить токен после максимального количества попыток"
+    );
+    queue.forEach((v) => v.reject("Не удалось обновить токен"));
     queue = [];
     onError?.(refreshError);
   } else {
     // TODO: resolve(token) ?
+    // console.log("Токен успешно обновлён");
     await Promise.all(queue.map((v) => v.resolve()));
     queue = [];
     onSuccess?.(refreshResponse);
@@ -74,11 +85,13 @@ const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
 
 type AxiosAuthRefreshOptions = {
   /** Количество попыток выполнения запроса */
-  retry: number;
+  maxRetryCount: number;
   /** Задержка применяемая перед следующей попыткой выполнения запроса в мс */
-  retryDelay: number;
-  /** Коды состояния для которых отработает перехватчик. */
+  retryDelayMs: number;
+  /** Коды состояния для которых отработает перехватчик */
   statusCodes: Array<number>;
+  /** Максимальное количество попыток обновления токена */
+  maxCallCount: number;
 };
 
 type AxiosAuthRefreshProps<TData = unknown, TError = unknown> = {
@@ -99,8 +112,9 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
 }: AxiosAuthRefreshProps<TData, TError>) => {
   const options = {
     statusCodes: [401],
-    retryDelay: 300,
-    retry: 3,
+    retryDelayMs: 300,
+    maxRetryCount: 3,
+    maxCallCount: 3,
     ...optionsProp,
   };
 
@@ -115,6 +129,14 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
       const hasStatus = options.statusCodes.includes(error.response?.status);
 
       if (!hasStatus || skipAuthRefresh) return Promise.reject(error);
+
+      if (callCount >= options.maxCallCount) {
+        onError?.();
+        const errorMessage =
+          "Превышено максимальное количество попыток обновления токена";
+        console.error(errorMessage);
+        return Promise.reject(new Error(errorMessage));
+      }
 
       const resultPromise = addToQueue({
         // TODO: handleRepeatRequest: (originalRequest) => axiosInstance.request(originalRequest),
