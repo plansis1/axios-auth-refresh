@@ -37,9 +37,10 @@ axiosAuthRefresh<TData, TError>({
   onSuccess: onRefreshSuccess,
   onError: onRefreshError,
   options: {
-    retry: 3,
-    retryDelay: 300,
     statusCodes: [401, 403],
+    retryDelayMs: 300,
+    maxRetryCount: 3,
+    maxCallCount: 3,
   },
 });
 ```
