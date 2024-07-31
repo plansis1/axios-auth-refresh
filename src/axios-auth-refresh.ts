@@ -1,7 +1,7 @@
-import { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
-import type { AxiosAuthRefreshRequestConfig } from "./types";
-import { sleep } from "./utils";
+import type { AxiosAuthRefreshRequestConfig } from './types';
+import { sleep } from './utils';
 
 let isRefreshing = false;
 let callCount = 0;
@@ -67,9 +67,9 @@ const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
 
   if (!isRefreshed) {
     console.error(
-      "Не удалось обновить токен после максимального количества попыток"
+      'Не удалось обновить токен после максимального количества попыток',
     );
-    queue.forEach((v) => v.reject("Не удалось обновить токен"));
+    queue.forEach((v) => v.reject('Не удалось обновить токен'));
     queue = [];
     onError?.(refreshError);
   } else {
@@ -133,7 +133,7 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
       if (callCount >= options.maxCallCount) {
         onError?.();
         const errorMessage =
-          "Превышено максимальное количество попыток обновления токена";
+          'Превышено максимальное количество попыток обновления токена';
         console.error(errorMessage);
         return Promise.reject(new Error(errorMessage));
       }
@@ -153,6 +153,6 @@ export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
       }
 
       return resultPromise;
-    }
+    },
   );
 };
