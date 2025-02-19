@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 
-export type AxiosAuthRefreshRequestConfig<D = unknown> = {
+export type AxiosAuthRefreshRequestConfig<D = any> = {
   /**
    * @example
    * // Есть возможность пропустить логику перехватчика для конкретных вызовов.
