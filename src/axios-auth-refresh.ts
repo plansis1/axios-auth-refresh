@@ -6,7 +6,7 @@ import { sleep } from './utils';
 let isRefreshing = false;
 let callCount = 0;
 
-type QueueItem = { resolve: () => void; reject: (err: unknown) => void };
+type QueueItem = { resolve: () => void; reject: (err: any) => void };
 let queue: Array<QueueItem> = [];
 
 type AddToQueue = { resolveAction: () => Promise<void> };
@@ -15,19 +15,19 @@ function addToQueue({ resolveAction }: AddToQueue) {
   return new Promise((resolve, reject) => {
     queue.push({
       resolve: () => resolve(resolveAction()),
-      reject: (err: unknown) => reject(err),
+      reject: (err: any) => reject(err),
     });
   });
 }
 
-type RefreshAndExecuteQueueProps<TData = unknown, TError = unknown> = {
+type RefreshAndExecuteQueueProps<TData = any, TError = any> = {
   refreshAuthCall: () => Promise<AxiosResponse<TData>>;
   onSuccess?: (res?: AxiosResponse<TData>) => void;
   onError?: (err?: AxiosError<TError>) => void;
   options: AxiosAuthRefreshOptions;
 };
 
-const refreshAndExecuteQueue = async <TData = unknown, TError = unknown>({
+const refreshAndExecuteQueue = async <TData = any, TError = any>({
   refreshAuthCall,
   onSuccess,
   onError,
@@ -94,7 +94,7 @@ type AxiosAuthRefreshOptions = {
   maxCallCount: number;
 };
 
-type AxiosAuthRefreshProps<TData = unknown, TError = unknown> = {
+type AxiosAuthRefreshProps<TData = any, TError = any> = {
   // TODO: axiosInstance`s ?
   axiosInstance: AxiosInstance;
   refreshAuthCall: () => Promise<AxiosResponse<TData>>;
@@ -103,7 +103,7 @@ type AxiosAuthRefreshProps<TData = unknown, TError = unknown> = {
   options?: Partial<AxiosAuthRefreshOptions>;
 };
 
-export const axiosAuthRefresh = <TData = unknown, TError = unknown>({
+export const axiosAuthRefresh = <TData = any, TError = any>({
   axiosInstance,
   refreshAuthCall, // <= TODO: skipAuthRefresh
   onError,
